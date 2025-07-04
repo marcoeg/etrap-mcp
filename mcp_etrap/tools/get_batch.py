@@ -15,7 +15,7 @@ class BatchInfoOut(BaseModel):
     size_bytes: Optional[int] = None
     operation_counts: Optional[Dict[str, int]] = None
     contract_address: str
-    nft_token_id: Optional[str] = None
+    nft_token_id: str
 
 def register_get_batch_tool(mcp: FastMCP, etrap_client: ETRAPClient) -> None:
     @mcp.tool(
@@ -50,6 +50,24 @@ def register_get_batch_tool(mcp: FastMCP, etrap_client: ETRAPClient) -> None:
                     "region": result.s3_location.region
                 }
             
+            # Get operation counts from batch data if available
+            operation_counts = None
+            try:
+                batch_data = await etrap_client.get_batch_data(batch_id)
+                if batch_data and batch_data.operation_counts:
+                    operation_counts = {
+                        "inserts": batch_data.operation_counts.inserts,
+                        "updates": batch_data.operation_counts.updates,
+                        "deletes": batch_data.operation_counts.deletes
+                    }
+            except Exception as e:
+                # Log S3 access failure for debugging
+                print(f"Warning: Could not retrieve operation counts for {batch_id}: {e}")
+                # operation_counts remains None - graceful degradation
+            
+            # Derive contract address from client
+            contract_address = etrap_client.contract_id
+            
             return BatchInfoOut(
                 batch_id=result.batch_id,
                 timestamp=result.timestamp.isoformat(),
@@ -59,13 +77,12 @@ def register_get_batch_tool(mcp: FastMCP, etrap_client: ETRAPClient) -> None:
                 merkle_root=result.merkle_root,
                 s3_location=s3_location,
                 size_bytes=result.size_bytes,
-                operation_counts=result.operation_counts,
-                contract_address=result.contract_address,
-                nft_token_id=result.nft_token_id
+                operation_counts=operation_counts,
+                contract_address=contract_address,
+                nft_token_id=result.batch_id  # batch_id IS the NFT token ID
             )
             
         except Exception as e:
-            # Log error but return None to indicate batch not found
-            # In a real implementation, you might want to distinguish between
-            # "not found" and "error occurred"
+            # Log error for debugging (import logging if needed)
+            print(f"Error in get_batch for {batch_id}: {e}")
             return None

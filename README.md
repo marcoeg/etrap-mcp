@@ -7,6 +7,7 @@ A Model Context Protocol (MCP) server for the ETRAP (Enterprise Transaction Reco
 - **Transaction Verification**: Verify individual transactions against blockchain records
 - **Batch Verification**: Efficiently verify multiple transactions in parallel
 - **Batch Management**: List, search, and inspect batches of transactions
+- **NFT Asset Information**: Access blockchain NFT metadata and ownership details
 - **Contract Information**: Get details about ETRAP smart contracts
 - **Multi-Transport Support**: stdio, SSE, and streamable-HTTP transports
 
@@ -85,6 +86,7 @@ ETRAP_ORGANIZATION=myorg uv run python -m mcp_etrap.app --transport sse --port 8
 - `verify_transaction`: Verify a single transaction with optional hints
 - `verify_batch`: Verify multiple transactions efficiently
 - `get_batch`: Get detailed batch information by ID
+- `get_nft`: Get NFT metadata and blockchain details for batch tokens
 - `list_batches`: List batches with filtering and pagination
 - `search_batches`: Advanced batch search with criteria
 - `get_contract_info`: Get contract statistics and information
@@ -133,7 +135,74 @@ All verification tools support optional hints as JSON objects to improve perform
 }
 ```
 
-**Note**: Time ranges must be in UTC to match blockchain timestamps. Database times are often in local timezone but blockchain stores UTC.
+**Important**: Time ranges refer to **blockchain batch creation time**, not database transaction time. When you provide a time range, you're searching for batches that were minted on the blockchain during that period. This is different from when the original database transactions occurred. Blockchain timestamps are always in UTC.
+
+### NFT Tools
+
+#### get_nft - NFT Metadata and Blockchain Asset Information
+
+The `get_nft` tool retrieves comprehensive NFT information for ETRAP batch tokens. In ETRAP, each batch creates a unique NFT on the NEAR blockchain that represents ownership of the audit record.
+
+**Input**: NFT token ID (same as batch ID)
+```json
+{
+  "nft_token_id": "BATCH-2025-07-01-c9de5968"
+}
+```
+
+**Output**: Complete NFT metadata and blockchain details
+```json
+{
+  "token_id": "BATCH-2025-07-01-c9de5968",
+  "owner_id": "lunaris.testnet",
+  "metadata": {
+    "title": "ETRAP Batch BATCH-2025-07-01-c9de5968",
+    "description": "Integrity certificate for 4 transactions from table financial_transactions",
+    "reference": "https://s3.amazonaws.com/etrap-lunaris/BATCH-2025-07-01-c9de5968/batch-data.json",
+    "issued_at": "1751388910475",
+    "copies": 1
+  },
+  "minted_timestamp": "2025-07-01T09:55:10.475000",
+  "batch_id": "BATCH-2025-07-01-c9de5968",
+  "organization_id": "lunaris",
+  "merkle_root": "b1e52265e4fd5afaf673454fe7351cbc516bea056c08f99e3d0876217b0aacab",
+  "blockchain_details": {
+    "contract_id": "lunaris.testnet",
+    "network": "testnet",
+    "token_standard": "NEP-171",
+    "approved_account_ids": {}
+  }
+}
+```
+
+**Key Features**:
+- **NEP-171 Compliant**: Full NEAR NFT standard compliance
+- **Ownership Information**: Current owner and approved accounts
+- **Rich Metadata**: Title, description, and S3 reference
+- **Blockchain Asset Data**: Contract details and minting information
+- **Cryptographic Integrity**: Merkle root for verification
+
+**Use Cases**:
+- **Asset Ownership**: Determine who owns the audit record NFT
+- **Metadata Access**: Get human-readable information about the batch
+- **Blockchain Integration**: Access NFT data for marketplace or transfer operations
+- **Compliance Documentation**: Generate certificates of audit record ownership
+
+#### Tool Comparison: get_batch vs get_nft
+
+**`get_batch`** - Audit Record Data:
+- Transaction details and operation counts
+- S3 storage information and batch statistics  
+- Database and table information
+- **Focus**: Audit trail and verification data
+
+**`get_nft`** - Blockchain Asset Data:
+- NFT ownership and metadata
+- Blockchain asset information
+- Minting timestamps and contract details
+- **Focus**: Digital asset and ownership information
+
+Both tools complement each other to provide complete visibility into ETRAP's tamper-proof audit system.
 
 ### Example
 

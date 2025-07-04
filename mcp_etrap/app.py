@@ -21,7 +21,7 @@ from etrap_sdk import ETRAPClient, S3Config
 
 def create_etrap_client() -> ETRAPClient:
     """Create and configure ETRAP client using environment configuration."""
-    # Setup S3 config if credentials are available
+    # Setup S3 config - always enable S3 to match SDK demo behavior
     s3_config = None
     if config.aws_access_key_id and config.aws_secret_access_key:
         s3_config = S3Config(
@@ -30,7 +30,8 @@ def create_etrap_client() -> ETRAPClient:
             secret_access_key=config.aws_secret_access_key
         )
     else:
-        # Use default S3 config with region only (relies on AWS environment/instance role)
+        # Use default S3 config with region only (relies on AWS default credential chain)
+        # This matches the SDK demo behavior and allows AWS CLI/IAM/environment credentials
         s3_config = S3Config(region=config.aws_region)
     
     return ETRAPClient(
@@ -48,6 +49,7 @@ try:
     from .tools.verify_transaction import register_verify_transaction_tool
     from .tools.verify_batch import register_verify_batch_tool
     from .tools.get_batch import register_get_batch_tool
+    from .tools.get_nft import register_get_nft_tool
     from .tools.list_batches import register_list_batches_tool
     from .tools.search_batches import register_search_batches_tool
     from .tools.get_contract_info import register_get_contract_info_tool
@@ -61,6 +63,7 @@ except ImportError:
     from mcp_etrap.tools.verify_transaction import register_verify_transaction_tool
     from mcp_etrap.tools.verify_batch import register_verify_batch_tool
     from mcp_etrap.tools.get_batch import register_get_batch_tool
+    from mcp_etrap.tools.get_nft import register_get_nft_tool
     from mcp_etrap.tools.list_batches import register_list_batches_tool
     from mcp_etrap.tools.search_batches import register_search_batches_tool
     from mcp_etrap.tools.get_contract_info import register_get_contract_info_tool
@@ -93,6 +96,7 @@ def main() -> None:
         3. Use verify_batch to verify multiple transactions efficiently
         4. Use list_batches or search_batches to explore available batch data
         5. Use get_batch to get detailed information about specific batches
+        6. Use get_nft to get NFT metadata and blockchain details for batch tokens
         
         Optimization tips:
         - Use hints (batch_id, time_range, database, table) to speed up verification
@@ -112,6 +116,7 @@ def main() -> None:
     register_verify_transaction_tool(mcp, etrap_client)
     register_verify_batch_tool(mcp, etrap_client)
     register_get_batch_tool(mcp, etrap_client)
+    register_get_nft_tool(mcp, etrap_client)
     register_list_batches_tool(mcp, etrap_client)
     register_search_batches_tool(mcp, etrap_client)
     register_get_contract_info_tool(mcp, etrap_client)
