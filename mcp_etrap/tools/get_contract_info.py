@@ -43,16 +43,16 @@ def register_get_contract_info_tool(mcp: FastMCP, etrap_client: ETRAPClient) -> 
             # Build response from available data
             if contract_info:
                 return ContractInfoOut(
-                    contract_address=contract_info.contract_address,
-                    organization_id=contract_info.organization_id,
-                    network=contract_info.network,
-                    total_batches=contract_stats.total_batches if contract_stats else 0,
-                    total_transactions=contract_stats.total_transactions if contract_stats else 0,
-                    oldest_batch_timestamp=contract_stats.oldest_batch_timestamp.isoformat() if contract_stats and contract_stats.oldest_batch_timestamp else None,
-                    newest_batch_timestamp=contract_stats.newest_batch_timestamp.isoformat() if contract_stats and contract_stats.newest_batch_timestamp else None,
-                    databases=contract_info.databases,
-                    contract_version=contract_info.contract_version,
-                    treasury_address=contract_info.treasury_address
+                    contract_address=contract_info.contract_id,
+                    organization_id=etrap_client.organization_id,
+                    network=etrap_client.network,
+                    total_batches=contract_info.total_batches,
+                    total_transactions=contract_info.total_transactions,
+                    oldest_batch_timestamp=contract_info.earliest_batch.isoformat() if contract_info.earliest_batch else None,
+                    newest_batch_timestamp=contract_info.latest_batch.isoformat() if contract_info.latest_batch else None,
+                    databases=contract_info.supported_databases,
+                    contract_version=None,
+                    treasury_address=None
                 )
             else:
                 # Fallback: build basic info from client configuration
