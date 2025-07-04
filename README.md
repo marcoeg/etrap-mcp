@@ -328,3 +328,21 @@ The project uses Hatchling as the build backend with specific configurations for
 - **Dependency Override**: UV's override feature ensures httpx compatibility
 
 This approach ensures we get the latest MCP features while maintaining ETRAP SDK functionality.
+
+
+
+## 🪪 License
+
+MIT. See `./LICENSE`
+
+
+## 📄 Copyright
+
+Copyright (c) 2025 Graziano Labs Corp. All rights reserved.
+
+
+## 📧 Contact
+
+For questions or support, please open an issue in the GitHub repository.
+
+---
