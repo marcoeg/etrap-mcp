@@ -5,6 +5,7 @@ from fastmcp import FastMCP
 from etrap_sdk import ETRAPClient, BatchVerificationResult, VerificationHints, TimeRange
 from datetime import datetime
 
+
 class BatchVerificationHintsInput(BaseModel):
     batch_id: Optional[str] = Field(None, description="Specific batch ID for direct lookup (fastest method)")
     database_name: Optional[str] = Field(None, description="Database name to limit search scope")
@@ -93,7 +94,7 @@ def register_verify_batch_tool(mcp: FastMCP, etrap_client: ETRAPClient) -> None:
                     pass
                 callback = progress_cb
             
-            # Use SDK's verify_batch method with hints support
+            # Use SDK's verify_batch method
             result: BatchVerificationResult = await etrap_client.verify_batch(
                 transactions=transactions,
                 hints=verification_hints,

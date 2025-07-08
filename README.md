@@ -53,7 +53,7 @@ Configure the server using environment variables:
 - `ETRAP_CACHE_TTL`: Cache TTL in seconds (default: 300)
 - `ETRAP_MAX_RETRIES`: Max retry attempts (default: 3)
 
-**AWS S3 (optional):**
+**AWS S3:**
 - `AWS_ACCESS_KEY_ID`: S3 access key
 - `AWS_SECRET_ACCESS_KEY`: S3 secret key
 - `AWS_DEFAULT_REGION`: S3 region (default: us-west-2)

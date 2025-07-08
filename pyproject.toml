@@ -10,7 +10,7 @@ requires-python = ">=3.11"
 dependencies = [
     "fastmcp>=2.8,<3.0",
     "uvicorn[standard]",
-    "etrap-sdk @ file:///home/marco/Development/mglabs/etrap/near/etrap-sdk",
+    "etrap-sdk>=0.1.0",
     "pydantic>=2.6",
     "python-dotenv",
     "httpx>=0.28.1",
